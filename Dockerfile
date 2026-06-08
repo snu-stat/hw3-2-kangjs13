@@ -6,6 +6,10 @@ RUN apt-get update && apt-get install -y \
     git \
     imagemagick \
     libmagick++-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libzmq3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ENV CONDA_DIR=/opt/conda
@@ -16,10 +20,13 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
 ENV PATH=${CONDA_DIR}/bin:${PATH}
 RUN conda create -n r-reticulate \
       --override-channels -c conda-forge \
-      python=3.10 numpy pandas matplotlib scipy statsmodels scikit-learn -y && \
+      python=3.10 numpy pandas matplotlib scipy statsmodels scikit-learn \
+      jupyterlab notebook ipykernel -y && \
     conda clean -afy
 
-RUN R -e "install.packages(c('reticulate', 'remotes', 'IRkernel', 'broom', 'MASS'))" && \
+ENV PATH=${CONDA_DIR}/envs/r-reticulate/bin:${CONDA_DIR}/bin:${PATH}
+
+RUN R -e "pkgs <- c('reticulate', 'remotes', 'IRkernel', 'broom'); install.packages(setdiff(pkgs, rownames(installed.packages())), repos = 'https://cloud.r-project.org')" && \
     R -e "IRkernel::installspec(user = FALSE)"
 
 ENV RETICULATE_PYTHON=/opt/conda/envs/r-reticulate/bin/python

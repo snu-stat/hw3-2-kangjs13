@@ -17,7 +17,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libzmq3-dev
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -45,7 +45,8 @@ jobs:
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          install.packages(c("reticulate", "knitr", "rmarkdown", "dplyr", "ggplot2", "broom", "MASS"))
+          pkgs <- c("reticulate", "knitr", "rmarkdown", "dplyr", "ggplot2", "broom")
+          install.packages(setdiff(pkgs, rownames(installed.packages())), repos = "https://cloud.r-project.org")
         shell: Rscript {0}
 
       - name: Prepare README as Index

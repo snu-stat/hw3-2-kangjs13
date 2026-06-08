@@ -1339,6 +1339,10 @@ RUN apt-get update && apt-get install -y \
     git \
     imagemagick \
     libmagick++-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libzmq3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Miniconda 설치
@@ -1351,11 +1355,13 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
 ENV PATH=$CONDA_DIR/bin:$PATH
 RUN conda create -n r-reticulate \
       --override-channels -c conda-forge \
-      python=3.10 numpy pandas matplotlib -y
+      python=3.10 numpy pandas matplotlib jupyterlab notebook ipykernel -y
 # 추가로 필요한 패키지 설치
 
 # 5. R 패키지 설치 (reticulate 및 필수 패키지)
-RUN R -e "install.packages(c('reticulate', 'remotes', 'IRkernel'))" && \
+ENV PATH=$CONDA_DIR/envs/r-reticulate/bin:$CONDA_DIR/bin:$PATH
+
+RUN R -e "pkgs <- c('reticulate', 'remotes', 'IRkernel'); install.packages(setdiff(pkgs, rownames(installed.packages())), repos = 'https://cloud.r-project.org')" && \
     R -e "IRkernel::installspec(user = FALSE)"
 # 추가로 필요한 패키지 설치
 
@@ -1394,6 +1400,10 @@ RUN apt-get update && apt-get install -y \
     git \
     imagemagick \
     libmagick++-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libzmq3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ENV CONDA_DIR=/opt/conda
@@ -1404,10 +1414,13 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
 ENV PATH=${CONDA_DIR}/bin:${PATH}
 RUN conda create -n r-reticulate \
       --override-channels -c conda-forge \
-      python=3.10 numpy pandas matplotlib scipy statsmodels scikit-learn -y && \
+      python=3.10 numpy pandas matplotlib scipy statsmodels scikit-learn \
+      jupyterlab notebook ipykernel -y && \
     conda clean -afy
 
-RUN R -e "install.packages(c('reticulate', 'remotes', 'IRkernel', 'broom', 'MASS'))" && \
+ENV PATH=${CONDA_DIR}/envs/r-reticulate/bin:${CONDA_DIR}/bin:${PATH}
+
+RUN R -e "pkgs <- c('reticulate', 'remotes', 'IRkernel', 'broom'); install.packages(setdiff(pkgs, rownames(installed.packages())), repos = 'https://cloud.r-project.org')" && \
     R -e "IRkernel::installspec(user = FALSE)"
 
 ENV RETICULATE_PYTHON=/opt/conda/envs/r-reticulate/bin/python
@@ -1475,7 +1488,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libzmq3-dev
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -1503,7 +1516,8 @@ jobs:
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          install.packages(c("reticulate", "knitr", "rmarkdown", "dplyr", "ggplot2", "broom", "MASS"))
+          pkgs <- c("reticulate", "knitr", "rmarkdown", "dplyr", "ggplot2", "broom")
+          install.packages(setdiff(pkgs, rownames(installed.packages())), repos = "https://cloud.r-project.org")
         shell: Rscript {0}
 
       - name: Prepare README as Index
