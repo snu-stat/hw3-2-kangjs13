@@ -1,5 +1,4 @@
-name: Quarto Publish and Binder Image
-
+name: Quarto Publish (R & Custom Packages)
 on:
   push:
     branches: [ main ]
@@ -17,7 +16,6 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libzmq3-dev
 
       - name: Setup Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -25,12 +23,12 @@ jobs:
           auto-update-conda: true
           python-version: '3.10'
           activate-environment: r-reticulate
-          channels: conda-forge
-          channel-priority: strict
+          channels: conda-forge,defaults
 
       - name: Install Python dependencies via Conda
         run: |
-          conda install -n r-reticulate --override-channels -c conda-forge numpy pandas matplotlib scipy statsmodels scikit-learn -y
+          conda install -n r-reticulate numpy pandas matplotlib polars scipy statsmodels scikit-learn -y
+        # 추가로 필요한 패키지 설치
         shell: bash -l {0}
 
       - name: Set up R
@@ -45,8 +43,8 @@ jobs:
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pkgs <- c("reticulate", "knitr", "rmarkdown", "dplyr", "ggplot2", "broom")
-          install.packages(setdiff(pkgs, rownames(installed.packages())), repos = "https://cloud.r-project.org")
+          install.packages(c("reticulate", "knitr", "rmarkdown", "dplyr", "ggplot2", "broom"))
+        # 추가로 필요한 패키지 설치
         shell: Rscript {0}
 
       - name: Prepare README as Index

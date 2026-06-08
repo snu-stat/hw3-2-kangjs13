@@ -6180,88 +6180,86 @@ steroid_log_ratio                0.1616     0.0748     2.161  0.0307      0.0151
 <span id="cb328-15"><a href="#cb328-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">tags</span><span class="kw">:</span><span class="at"> ghcr.io/${{ github.repository_owner }}/my-r-env:latest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <section id="답안-6" class="level3">
 <h3 class="anchored" data-anchor-id="답안-6">답안</h3>
-<p><code>.github/workflows/publish.yml</code>은 다음과 같이 작성한다. 숙제 2의 HTML 및 ipynb 생성, GitHub Pages 배포 단계 뒤에 GHCR 로그인과 Docker 이미지 빌드/푸시 단계를 추가한다.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb329"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb329-1"><a href="#cb329-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Quarto Publish and Binder Image</span></span>
-<span id="cb329-2"><a href="#cb329-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-3"><a href="#cb329-3" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
-<span id="cb329-4"><a href="#cb329-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
-<span id="cb329-5"><a href="#cb329-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> main </span><span class="kw">]</span></span>
-<span id="cb329-6"><a href="#cb329-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-7"><a href="#cb329-7" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
-<span id="cb329-8"><a href="#cb329-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">build-deploy</span><span class="kw">:</span></span>
-<span id="cb329-9"><a href="#cb329-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
-<span id="cb329-10"><a href="#cb329-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">permissions</span><span class="kw">:</span></span>
-<span id="cb329-11"><a href="#cb329-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> write</span></span>
-<span id="cb329-12"><a href="#cb329-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">packages</span><span class="kw">:</span><span class="at"> write</span></span>
-<span id="cb329-13"><a href="#cb329-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
-<span id="cb329-14"><a href="#cb329-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Check out repository</span></span>
-<span id="cb329-15"><a href="#cb329-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
-<span id="cb329-16"><a href="#cb329-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-17"><a href="#cb329-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install System Dependencies</span></span>
-<span id="cb329-18"><a href="#cb329-18" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb329-19"><a href="#cb329-19" aria-hidden="true" tabindex="-1"></a>          sudo apt-get update</span>
-<span id="cb329-20"><a href="#cb329-20" aria-hidden="true" tabindex="-1"></a>          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libzmq3-dev</span>
-<span id="cb329-21"><a href="#cb329-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-22"><a href="#cb329-22" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Setup Miniconda</span></span>
-<span id="cb329-23"><a href="#cb329-23" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> conda-incubator/setup-miniconda@v3</span></span>
-<span id="cb329-24"><a href="#cb329-24" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-25"><a href="#cb329-25" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">auto-update-conda</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb329-26"><a href="#cb329-26" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;3.10&#39;</span></span>
-<span id="cb329-27"><a href="#cb329-27" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">activate-environment</span><span class="kw">:</span><span class="at"> r-reticulate</span></span>
-<span id="cb329-28"><a href="#cb329-28" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">channels</span><span class="kw">:</span><span class="at"> conda-forge</span></span>
-<span id="cb329-29"><a href="#cb329-29" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">channel-priority</span><span class="kw">:</span><span class="at"> strict</span></span>
-<span id="cb329-30"><a href="#cb329-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-31"><a href="#cb329-31" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install Python dependencies via Conda</span></span>
-<span id="cb329-32"><a href="#cb329-32" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb329-33"><a href="#cb329-33" aria-hidden="true" tabindex="-1"></a>          conda install -n r-reticulate --override-channels -c conda-forge numpy pandas matplotlib scipy statsmodels scikit-learn -y</span>
-<span id="cb329-34"><a href="#cb329-34" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> bash -l {0}</span></span>
-<span id="cb329-35"><a href="#cb329-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-36"><a href="#cb329-36" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up R</span></span>
-<span id="cb329-37"><a href="#cb329-37" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> r-lib/actions/setup-r@v2</span></span>
-<span id="cb329-38"><a href="#cb329-38" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-39"><a href="#cb329-39" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">use-public-rspm</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb329-40"><a href="#cb329-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-41"><a href="#cb329-41" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Quarto</span></span>
-<span id="cb329-42"><a href="#cb329-42" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> quarto-dev/quarto-actions/setup@v2</span></span>
-<span id="cb329-43"><a href="#cb329-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-44"><a href="#cb329-44" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install R Packages</span></span>
-<span id="cb329-45"><a href="#cb329-45" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
-<span id="cb329-46"><a href="#cb329-46" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">GITHUB_PAT</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
-<span id="cb329-47"><a href="#cb329-47" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb329-48"><a href="#cb329-48" aria-hidden="true" tabindex="-1"></a>          pkgs &lt;- c(&quot;reticulate&quot;, &quot;knitr&quot;, &quot;rmarkdown&quot;, &quot;dplyr&quot;, &quot;ggplot2&quot;, &quot;broom&quot;)</span>
-<span id="cb329-49"><a href="#cb329-49" aria-hidden="true" tabindex="-1"></a>          install.packages(setdiff(pkgs, rownames(installed.packages())), repos = &quot;https://cloud.r-project.org&quot;)</span>
-<span id="cb329-50"><a href="#cb329-50" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> Rscript {0}</span></span>
-<span id="cb329-51"><a href="#cb329-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-52"><a href="#cb329-52" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Prepare README as Index</span></span>
-<span id="cb329-53"><a href="#cb329-53" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> cp README.md index.md</span></span>
-<span id="cb329-54"><a href="#cb329-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-55"><a href="#cb329-55" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Render Quarto</span></span>
-<span id="cb329-56"><a href="#cb329-56" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb329-57"><a href="#cb329-57" aria-hidden="true" tabindex="-1"></a>          export RETICULATE_PYTHON=$(conda info --base)/envs/r-reticulate/bin/python</span>
-<span id="cb329-58"><a href="#cb329-58" aria-hidden="true" tabindex="-1"></a>          quarto render</span>
-<span id="cb329-59"><a href="#cb329-59" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> bash -l {0}</span></span>
-<span id="cb329-60"><a href="#cb329-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-61"><a href="#cb329-61" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Deploy to GitHub Pages</span></span>
-<span id="cb329-62"><a href="#cb329-62" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> peaceiris/actions-gh-pages@v3</span></span>
-<span id="cb329-63"><a href="#cb329-63" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-64"><a href="#cb329-64" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">github_token</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
-<span id="cb329-65"><a href="#cb329-65" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">publish_dir</span><span class="kw">:</span><span class="at"> ./_site</span></span>
-<span id="cb329-66"><a href="#cb329-66" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">publish_branch</span><span class="kw">:</span><span class="at"> gh-pages</span></span>
-<span id="cb329-67"><a href="#cb329-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-68"><a href="#cb329-68" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Log in to GitHub Container Registry</span></span>
-<span id="cb329-69"><a href="#cb329-69" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> docker/login-action@v3</span></span>
-<span id="cb329-70"><a href="#cb329-70" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-71"><a href="#cb329-71" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">registry</span><span class="kw">:</span><span class="at"> ghcr.io</span></span>
-<span id="cb329-72"><a href="#cb329-72" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">username</span><span class="kw">:</span><span class="at"> ${{ github.actor }}</span></span>
-<span id="cb329-73"><a href="#cb329-73" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">password</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
-<span id="cb329-74"><a href="#cb329-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-75"><a href="#cb329-75" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Build and push Docker image</span></span>
-<span id="cb329-76"><a href="#cb329-76" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> docker/build-push-action@v5</span></span>
-<span id="cb329-77"><a href="#cb329-77" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-78"><a href="#cb329-78" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">context</span><span class="kw">:</span><span class="at"> .</span></span>
-<span id="cb329-79"><a href="#cb329-79" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">push</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb329-80"><a href="#cb329-80" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">tags</span><span class="kw">:</span><span class="at"> ghcr.io/${{ github.repository_owner }}/my-r-env:latest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>GHCR 푸시를 위해 <code>permissions</code>에 <code>packages: write</code>를 추가하였다. <code>Dockerfile</code>에서 <code>_site/hw03.ipynb</code>를 복사하므로 Docker 빌드는 반드시 Quarto 렌더링 뒤에 실행되어야 한다.</p>
+<p><code>.github/workflows/publish.yml</code>은 다음과 같이 작성한다. 숙제 2의 HTML 및 ipynb 생성, GitHub Pages 배포 단계를 유지하고, 이번 과제에서 필요한 패키지를 추가한 뒤 마지막에 GHCR 로그인과 Docker 이미지 빌드/푸시 단계를 추가한다.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb329"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb329-1"><a href="#cb329-1" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="at"> Quarto Publish (R &amp; Custom Packages)</span></span>
+<span id="cb329-2"><a href="#cb329-2" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb329-3"><a href="#cb329-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
+<span id="cb329-4"><a href="#cb329-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> main </span><span class="kw">]</span></span>
+<span id="cb329-5"><a href="#cb329-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-6"><a href="#cb329-6" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb329-7"><a href="#cb329-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">build-deploy</span><span class="kw">:</span></span>
+<span id="cb329-8"><a href="#cb329-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-latest</span></span>
+<span id="cb329-9"><a href="#cb329-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">permissions</span><span class="kw">:</span></span>
+<span id="cb329-10"><a href="#cb329-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">contents</span><span class="kw">:</span><span class="at"> write</span></span>
+<span id="cb329-11"><a href="#cb329-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">packages</span><span class="kw">:</span><span class="at"> write</span></span>
+<span id="cb329-12"><a href="#cb329-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb329-13"><a href="#cb329-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Check out repository</span></span>
+<span id="cb329-14"><a href="#cb329-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> actions/checkout@v4</span></span>
+<span id="cb329-15"><a href="#cb329-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-16"><a href="#cb329-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install System Dependencies</span></span>
+<span id="cb329-17"><a href="#cb329-17" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb329-18"><a href="#cb329-18" aria-hidden="true" tabindex="-1"></a>          sudo apt-get update</span>
+<span id="cb329-19"><a href="#cb329-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-20"><a href="#cb329-20" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Setup Miniconda</span></span>
+<span id="cb329-21"><a href="#cb329-21" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> conda-incubator/setup-miniconda@v3</span></span>
+<span id="cb329-22"><a href="#cb329-22" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-23"><a href="#cb329-23" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">auto-update-conda</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb329-24"><a href="#cb329-24" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;3.10&#39;</span></span>
+<span id="cb329-25"><a href="#cb329-25" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">activate-environment</span><span class="kw">:</span><span class="at"> r-reticulate</span></span>
+<span id="cb329-26"><a href="#cb329-26" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">channels</span><span class="kw">:</span><span class="at"> conda-forge,defaults</span></span>
+<span id="cb329-27"><a href="#cb329-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-28"><a href="#cb329-28" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install Python dependencies via Conda</span></span>
+<span id="cb329-29"><a href="#cb329-29" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb329-30"><a href="#cb329-30" aria-hidden="true" tabindex="-1"></a>          conda install -n r-reticulate numpy pandas matplotlib polars scipy statsmodels scikit-learn -y</span>
+<span id="cb329-31"><a href="#cb329-31" aria-hidden="true" tabindex="-1"></a><span class="co">        # 추가로 필요한 패키지 설치</span></span>
+<span id="cb329-32"><a href="#cb329-32" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> bash -l {0}</span></span>
+<span id="cb329-33"><a href="#cb329-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-34"><a href="#cb329-34" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up R</span></span>
+<span id="cb329-35"><a href="#cb329-35" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> r-lib/actions/setup-r@v2</span></span>
+<span id="cb329-36"><a href="#cb329-36" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-37"><a href="#cb329-37" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">use-public-rspm</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb329-38"><a href="#cb329-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-39"><a href="#cb329-39" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Quarto</span></span>
+<span id="cb329-40"><a href="#cb329-40" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> quarto-dev/quarto-actions/setup@v2</span></span>
+<span id="cb329-41"><a href="#cb329-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-42"><a href="#cb329-42" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install R Packages</span></span>
+<span id="cb329-43"><a href="#cb329-43" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb329-44"><a href="#cb329-44" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">GITHUB_PAT</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
+<span id="cb329-45"><a href="#cb329-45" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb329-46"><a href="#cb329-46" aria-hidden="true" tabindex="-1"></a>          install.packages(c(&quot;reticulate&quot;, &quot;knitr&quot;, &quot;rmarkdown&quot;, &quot;dplyr&quot;, &quot;ggplot2&quot;, &quot;broom&quot;))</span>
+<span id="cb329-47"><a href="#cb329-47" aria-hidden="true" tabindex="-1"></a><span class="co">        # 추가로 필요한 패키지 설치</span></span>
+<span id="cb329-48"><a href="#cb329-48" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> Rscript {0}</span></span>
+<span id="cb329-49"><a href="#cb329-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-50"><a href="#cb329-50" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Prepare README as Index</span></span>
+<span id="cb329-51"><a href="#cb329-51" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> cp README.md index.md</span></span>
+<span id="cb329-52"><a href="#cb329-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-53"><a href="#cb329-53" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Render Quarto</span></span>
+<span id="cb329-54"><a href="#cb329-54" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb329-55"><a href="#cb329-55" aria-hidden="true" tabindex="-1"></a>          export RETICULATE_PYTHON=$(conda info --base)/envs/r-reticulate/bin/python</span>
+<span id="cb329-56"><a href="#cb329-56" aria-hidden="true" tabindex="-1"></a>          quarto render</span>
+<span id="cb329-57"><a href="#cb329-57" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> bash -l {0}</span></span>
+<span id="cb329-58"><a href="#cb329-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-59"><a href="#cb329-59" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Deploy to GitHub Pages</span></span>
+<span id="cb329-60"><a href="#cb329-60" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> peaceiris/actions-gh-pages@v3</span></span>
+<span id="cb329-61"><a href="#cb329-61" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-62"><a href="#cb329-62" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">github_token</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
+<span id="cb329-63"><a href="#cb329-63" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">publish_dir</span><span class="kw">:</span><span class="at"> ./_site</span></span>
+<span id="cb329-64"><a href="#cb329-64" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">publish_branch</span><span class="kw">:</span><span class="at"> gh-pages</span></span>
+<span id="cb329-65"><a href="#cb329-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-66"><a href="#cb329-66" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Log in to GitHub Container Registry</span></span>
+<span id="cb329-67"><a href="#cb329-67" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> docker/login-action@v3</span></span>
+<span id="cb329-68"><a href="#cb329-68" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-69"><a href="#cb329-69" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">registry</span><span class="kw">:</span><span class="at"> ghcr.io</span></span>
+<span id="cb329-70"><a href="#cb329-70" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">username</span><span class="kw">:</span><span class="at"> ${{ github.actor }}</span></span>
+<span id="cb329-71"><a href="#cb329-71" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">password</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
+<span id="cb329-72"><a href="#cb329-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-73"><a href="#cb329-73" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Build and push Docker image</span></span>
+<span id="cb329-74"><a href="#cb329-74" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> docker/build-push-action@v5</span></span>
+<span id="cb329-75"><a href="#cb329-75" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-76"><a href="#cb329-76" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">context</span><span class="kw">:</span><span class="at"> .</span></span>
+<span id="cb329-77"><a href="#cb329-77" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">push</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb329-78"><a href="#cb329-78" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">tags</span><span class="kw">:</span><span class="at"> ghcr.io/${{ github.repository_owner }}/my-r-env:latest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>GHCR 푸시를 위해 <code>permissions</code>에 <code>packages: write</code>를 추가하였다. <code>MASS</code>는 R의 recommended 패키지로 함께 제공되므로 CRAN 설치 목록에서는 제외하였다. <code>Dockerfile</code>에서 <code>_site/hw03.ipynb</code>를 복사하므로 Docker 빌드는 반드시 Quarto 렌더링 뒤에 실행되어야 한다.</p>
 </section>
 </section>
 <section id="문제-3-3.-github-pages에-binder-링크-추가" class="level2">
