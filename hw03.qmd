@@ -1546,10 +1546,10 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/my-r-env:latest
+          tags: ghcr.io/${{ github.repository }}:latest
 ```
 
-GHCR 푸시를 위해 `permissions`에 `packages: write`를 추가하였다. `MASS`는 R의 recommended 패키지로 함께 제공되므로 CRAN 설치 목록에서는 제외하였다. `Dockerfile`에서 `_site/hw03.ipynb`를 복사하므로 Docker 빌드는 반드시 Quarto 렌더링 뒤에 실행되어야 한다.
+GHCR 푸시를 위해 `permissions`에 `packages: write`를 추가하였다. 이미지 태그는 `ghcr.io/${{ github.repository }}:latest`로 지정하여 `ghcr.io/snu-stat/hw3-2-kangjs13:latest`처럼 저장소별로 고유한 패키지 이름을 사용한다. 이렇게 하면 조직 안의 다른 저장소가 같은 `my-r-env` 패키지 이름으로 푸시할 때 생기는 `write_package` 권한 충돌을 피할 수 있다. `MASS`는 R의 recommended 패키지로 함께 제공되므로 CRAN 설치 목록에서는 제외하였다. `Dockerfile`에서 `_site/hw03.ipynb`를 복사하므로 Docker 빌드는 반드시 Quarto 렌더링 뒤에 실행되어야 한다.
 
 ## 문제 3-3. GitHub Pages에 Binder 링크 추가
 
