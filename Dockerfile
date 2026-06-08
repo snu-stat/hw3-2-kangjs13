@@ -14,9 +14,9 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     rm /tmp/miniconda.sh
 
 ENV PATH=${CONDA_DIR}/bin:${PATH}
-RUN conda create -n r-reticulate python=3.10 -y && \
-    conda install -n r-reticulate -c conda-forge \
-      numpy pandas matplotlib scipy statsmodels scikit-learn -y && \
+RUN conda create -n r-reticulate \
+      --override-channels -c conda-forge \
+      python=3.10 numpy pandas matplotlib scipy statsmodels scikit-learn -y && \
     conda clean -afy
 
 RUN R -e "install.packages(c('reticulate', 'remotes', 'IRkernel', 'broom', 'MASS'))" && \

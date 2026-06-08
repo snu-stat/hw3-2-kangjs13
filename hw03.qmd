@@ -1349,8 +1349,9 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
 
 # 4. Conda 경로 설정 및 환경 생성
 ENV PATH=$CONDA_DIR/bin:$PATH
-RUN conda create -n r-reticulate python=3.10 -y && \
-    conda install -n r-reticulate -c conda-forge numpy pandas matplotlib -y
+RUN conda create -n r-reticulate \
+      --override-channels -c conda-forge \
+      python=3.10 numpy pandas matplotlib -y
 # 추가로 필요한 패키지 설치
 
 # 5. R 패키지 설치 (reticulate 및 필수 패키지)
@@ -1401,9 +1402,9 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     rm /tmp/miniconda.sh
 
 ENV PATH=${CONDA_DIR}/bin:${PATH}
-RUN conda create -n r-reticulate python=3.10 -y && \
-    conda install -n r-reticulate -c conda-forge \
-      numpy pandas matplotlib scipy statsmodels scikit-learn -y && \
+RUN conda create -n r-reticulate \
+      --override-channels -c conda-forge \
+      python=3.10 numpy pandas matplotlib scipy statsmodels scikit-learn -y && \
     conda clean -afy
 
 RUN R -e "install.packages(c('reticulate', 'remotes', 'IRkernel', 'broom', 'MASS'))" && \
@@ -1482,11 +1483,12 @@ jobs:
           auto-update-conda: true
           python-version: '3.10'
           activate-environment: r-reticulate
-          channels: conda-forge,defaults
+          channels: conda-forge
+          channel-priority: strict
 
       - name: Install Python dependencies via Conda
         run: |
-          conda install -n r-reticulate numpy pandas matplotlib scipy statsmodels scikit-learn -y
+          conda install -n r-reticulate --override-channels -c conda-forge numpy pandas matplotlib scipy statsmodels scikit-learn -y
         shell: bash -l {0}
 
       - name: Set up R

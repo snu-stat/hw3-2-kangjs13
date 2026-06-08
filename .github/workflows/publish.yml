@@ -25,11 +25,12 @@ jobs:
           auto-update-conda: true
           python-version: '3.10'
           activate-environment: r-reticulate
-          channels: conda-forge,defaults
+          channels: conda-forge
+          channel-priority: strict
 
       - name: Install Python dependencies via Conda
         run: |
-          conda install -n r-reticulate numpy pandas matplotlib scipy statsmodels scikit-learn -y
+          conda install -n r-reticulate --override-channels -c conda-forge numpy pandas matplotlib scipy statsmodels scikit-learn -y
         shell: bash -l {0}
 
       - name: Set up R
