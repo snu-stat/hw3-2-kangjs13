@@ -6073,34 +6073,35 @@ steroid_log_ratio                0.1616     0.0748     2.161  0.0307      0.0151
 <span id="cb326-18"><a href="#cb326-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb326-19"><a href="#cb326-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Conda 경로 설정 및 환경 생성</span></span>
 <span id="cb326-20"><a href="#cb326-20" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> PATH=$CONDA_DIR/bin:$PATH</span>
-<span id="cb326-21"><a href="#cb326-21" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">conda</span> create <span class="at">-n</span> r-reticulate python=3.10 <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
-<span id="cb326-22"><a href="#cb326-22" aria-hidden="true" tabindex="-1"></a>    <span class="ex">conda</span> install <span class="at">-n</span> r-reticulate <span class="at">-c</span> conda-forge numpy pandas matplotlib <span class="at">-y</span></span>
-<span id="cb326-23"><a href="#cb326-23" aria-hidden="true" tabindex="-1"></a><span class="co"># 추가로 필요한 패키지 설치</span></span>
-<span id="cb326-24"><a href="#cb326-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb326-25"><a href="#cb326-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. R 패키지 설치 (reticulate 및 필수 패키지)</span></span>
-<span id="cb326-26"><a href="#cb326-26" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">R</span> <span class="at">-e</span> <span class="st">&quot;install.packages(c(&#39;reticulate&#39;, &#39;remotes&#39;, &#39;IRkernel&#39;))&quot;</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
-<span id="cb326-27"><a href="#cb326-27" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R</span> <span class="at">-e</span> <span class="st">&quot;IRkernel::installspec(user = FALSE)&quot;</span></span>
-<span id="cb326-28"><a href="#cb326-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 추가로 필요한 패키지 설치</span></span>
-<span id="cb326-29"><a href="#cb326-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb326-30"><a href="#cb326-30" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. reticulate가 사용할 Python 경로 고정 (환경 변수)</span></span>
-<span id="cb326-31"><a href="#cb326-31" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> RETICULATE_PYTHON=/opt/conda/envs/r-reticulate/bin/python</span>
-<span id="cb326-32"><a href="#cb326-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb326-33"><a href="#cb326-33" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Binder용 jovyan 유저 생성</span></span>
-<span id="cb326-34"><a href="#cb326-34" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> NB_USER=jovyan</span>
-<span id="cb326-35"><a href="#cb326-35" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> NB_UID=1000</span>
-<span id="cb326-36"><a href="#cb326-36" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">usermod</span> <span class="at">-l</span> <span class="va">${NB_USER}</span> rstudio <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
-<span id="cb326-37"><a href="#cb326-37" aria-hidden="true" tabindex="-1"></a>    <span class="ex">usermod</span> <span class="at">-d</span> /home/<span class="va">${NB_USER}</span> <span class="at">-m</span> <span class="va">${NB_USER}</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
-<span id="cb326-38"><a href="#cb326-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">chown</span> <span class="at">-R</span> <span class="va">${NB_USER}</span> /opt/conda /home/<span class="va">${NB_USER}</span></span>
-<span id="cb326-39"><a href="#cb326-39" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb326-40"><a href="#cb326-40" aria-hidden="true" tabindex="-1"></a><span class="co"># 8. 노트북 파일 복사</span></span>
-<span id="cb326-41"><a href="#cb326-41" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> _site/hw03.ipynb /home/${NB_USER}/hw03.ipynb</span>
-<span id="cb326-42"><a href="#cb326-42" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="fu">chown</span> <span class="va">${NB_USER}</span>:users /home/<span class="va">${NB_USER}</span>/hw03.ipynb</span>
-<span id="cb326-43"><a href="#cb326-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb326-44"><a href="#cb326-44" aria-hidden="true" tabindex="-1"></a><span class="kw">USER</span> ${NB_USER}</span>
-<span id="cb326-45"><a href="#cb326-45" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /home/${NB_USER}</span>
-<span id="cb326-46"><a href="#cb326-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb326-47"><a href="#cb326-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Binder가 기대하는 포트</span></span>
-<span id="cb326-48"><a href="#cb326-48" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 8888</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb326-21"><a href="#cb326-21" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">conda</span> create <span class="at">-n</span> r-reticulate <span class="dt">\</span></span>
+<span id="cb326-22"><a href="#cb326-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">--override-channels</span> <span class="at">-c</span> conda-forge <span class="dt">\</span></span>
+<span id="cb326-23"><a href="#cb326-23" aria-hidden="true" tabindex="-1"></a>      python=3.10 numpy pandas matplotlib <span class="at">-y</span></span>
+<span id="cb326-24"><a href="#cb326-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 추가로 필요한 패키지 설치</span></span>
+<span id="cb326-25"><a href="#cb326-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb326-26"><a href="#cb326-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. R 패키지 설치 (reticulate 및 필수 패키지)</span></span>
+<span id="cb326-27"><a href="#cb326-27" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">R</span> <span class="at">-e</span> <span class="st">&quot;install.packages(c(&#39;reticulate&#39;, &#39;remotes&#39;, &#39;IRkernel&#39;))&quot;</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb326-28"><a href="#cb326-28" aria-hidden="true" tabindex="-1"></a>    <span class="ex">R</span> <span class="at">-e</span> <span class="st">&quot;IRkernel::installspec(user = FALSE)&quot;</span></span>
+<span id="cb326-29"><a href="#cb326-29" aria-hidden="true" tabindex="-1"></a><span class="co"># 추가로 필요한 패키지 설치</span></span>
+<span id="cb326-30"><a href="#cb326-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb326-31"><a href="#cb326-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. reticulate가 사용할 Python 경로 고정 (환경 변수)</span></span>
+<span id="cb326-32"><a href="#cb326-32" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> RETICULATE_PYTHON=/opt/conda/envs/r-reticulate/bin/python</span>
+<span id="cb326-33"><a href="#cb326-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb326-34"><a href="#cb326-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Binder용 jovyan 유저 생성</span></span>
+<span id="cb326-35"><a href="#cb326-35" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> NB_USER=jovyan</span>
+<span id="cb326-36"><a href="#cb326-36" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> NB_UID=1000</span>
+<span id="cb326-37"><a href="#cb326-37" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">usermod</span> <span class="at">-l</span> <span class="va">${NB_USER}</span> rstudio <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb326-38"><a href="#cb326-38" aria-hidden="true" tabindex="-1"></a>    <span class="ex">usermod</span> <span class="at">-d</span> /home/<span class="va">${NB_USER}</span> <span class="at">-m</span> <span class="va">${NB_USER}</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb326-39"><a href="#cb326-39" aria-hidden="true" tabindex="-1"></a>    <span class="fu">chown</span> <span class="at">-R</span> <span class="va">${NB_USER}</span> /opt/conda /home/<span class="va">${NB_USER}</span></span>
+<span id="cb326-40"><a href="#cb326-40" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb326-41"><a href="#cb326-41" aria-hidden="true" tabindex="-1"></a><span class="co"># 8. 노트북 파일 복사</span></span>
+<span id="cb326-42"><a href="#cb326-42" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> _site/hw03.ipynb /home/${NB_USER}/hw03.ipynb</span>
+<span id="cb326-43"><a href="#cb326-43" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="fu">chown</span> <span class="va">${NB_USER}</span>:users /home/<span class="va">${NB_USER}</span>/hw03.ipynb</span>
+<span id="cb326-44"><a href="#cb326-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb326-45"><a href="#cb326-45" aria-hidden="true" tabindex="-1"></a><span class="kw">USER</span> ${NB_USER}</span>
+<span id="cb326-46"><a href="#cb326-46" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /home/${NB_USER}</span>
+<span id="cb326-47"><a href="#cb326-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb326-48"><a href="#cb326-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Binder가 기대하는 포트</span></span>
+<span id="cb326-49"><a href="#cb326-49" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 8888</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <section id="답안-5" class="level3">
 <h3 class="anchored" data-anchor-id="답안-5">답안</h3>
 <p>저장소 최상위 디렉토리에 <code>Dockerfile</code>을 추가한다. 이번 과제의 R 코드에는 <code>dplyr</code>, <code>ggplot2</code>, <code>broom</code>, <code>MASS</code>, <code>reticulate</code>, <code>IRkernel</code>이 필요하고, Python 노트북 실행을 위해 기본 과학계산 패키지도 설치한다.</p>
@@ -6120,9 +6121,9 @@ steroid_log_ratio                0.1616     0.0748     2.161  0.0307      0.0151
 <span id="cb327-14"><a href="#cb327-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rm</span> /tmp/miniconda.sh</span>
 <span id="cb327-15"><a href="#cb327-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb327-16"><a href="#cb327-16" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> PATH=${CONDA_DIR}/bin:${PATH}</span>
-<span id="cb327-17"><a href="#cb327-17" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">conda</span> create <span class="at">-n</span> r-reticulate python=3.10 <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
-<span id="cb327-18"><a href="#cb327-18" aria-hidden="true" tabindex="-1"></a>    <span class="ex">conda</span> install <span class="at">-n</span> r-reticulate <span class="at">-c</span> conda-forge <span class="dt">\</span></span>
-<span id="cb327-19"><a href="#cb327-19" aria-hidden="true" tabindex="-1"></a>      numpy pandas matplotlib scipy statsmodels scikit-learn <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb327-17"><a href="#cb327-17" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">conda</span> create <span class="at">-n</span> r-reticulate <span class="dt">\</span></span>
+<span id="cb327-18"><a href="#cb327-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">--override-channels</span> <span class="at">-c</span> conda-forge <span class="dt">\</span></span>
+<span id="cb327-19"><a href="#cb327-19" aria-hidden="true" tabindex="-1"></a>      python=3.10 numpy pandas matplotlib scipy statsmodels scikit-learn <span class="at">-y</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
 <span id="cb327-20"><a href="#cb327-20" aria-hidden="true" tabindex="-1"></a>    <span class="ex">conda</span> clean <span class="at">-afy</span></span>
 <span id="cb327-21"><a href="#cb327-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb327-22"><a href="#cb327-22" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">R</span> <span class="at">-e</span> <span class="st">&quot;install.packages(c(&#39;reticulate&#39;, &#39;remotes&#39;, &#39;IRkernel&#39;, &#39;broom&#39;, &#39;MASS&#39;))&quot;</span> <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
@@ -6194,57 +6195,58 @@ steroid_log_ratio                0.1616     0.0748     2.161  0.0307      0.0151
 <span id="cb329-25"><a href="#cb329-25" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">auto-update-conda</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
 <span id="cb329-26"><a href="#cb329-26" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">python-version</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;3.10&#39;</span></span>
 <span id="cb329-27"><a href="#cb329-27" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">activate-environment</span><span class="kw">:</span><span class="at"> r-reticulate</span></span>
-<span id="cb329-28"><a href="#cb329-28" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">channels</span><span class="kw">:</span><span class="at"> conda-forge,defaults</span></span>
-<span id="cb329-29"><a href="#cb329-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-30"><a href="#cb329-30" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install Python dependencies via Conda</span></span>
-<span id="cb329-31"><a href="#cb329-31" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb329-32"><a href="#cb329-32" aria-hidden="true" tabindex="-1"></a>          conda install -n r-reticulate numpy pandas matplotlib scipy statsmodels scikit-learn -y</span>
-<span id="cb329-33"><a href="#cb329-33" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> bash -l {0}</span></span>
-<span id="cb329-34"><a href="#cb329-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-35"><a href="#cb329-35" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up R</span></span>
-<span id="cb329-36"><a href="#cb329-36" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> r-lib/actions/setup-r@v2</span></span>
-<span id="cb329-37"><a href="#cb329-37" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-38"><a href="#cb329-38" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">use-public-rspm</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb329-39"><a href="#cb329-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-40"><a href="#cb329-40" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Quarto</span></span>
-<span id="cb329-41"><a href="#cb329-41" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> quarto-dev/quarto-actions/setup@v2</span></span>
-<span id="cb329-42"><a href="#cb329-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-43"><a href="#cb329-43" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install R Packages</span></span>
-<span id="cb329-44"><a href="#cb329-44" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
-<span id="cb329-45"><a href="#cb329-45" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">GITHUB_PAT</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
-<span id="cb329-46"><a href="#cb329-46" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb329-47"><a href="#cb329-47" aria-hidden="true" tabindex="-1"></a>          install.packages(c(&quot;reticulate&quot;, &quot;knitr&quot;, &quot;rmarkdown&quot;, &quot;dplyr&quot;, &quot;ggplot2&quot;, &quot;broom&quot;, &quot;MASS&quot;))</span>
-<span id="cb329-48"><a href="#cb329-48" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> Rscript {0}</span></span>
-<span id="cb329-49"><a href="#cb329-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-50"><a href="#cb329-50" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Prepare README as Index</span></span>
-<span id="cb329-51"><a href="#cb329-51" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> cp README.md index.md</span></span>
-<span id="cb329-52"><a href="#cb329-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-53"><a href="#cb329-53" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Render Quarto</span></span>
-<span id="cb329-54"><a href="#cb329-54" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
-<span id="cb329-55"><a href="#cb329-55" aria-hidden="true" tabindex="-1"></a>          export RETICULATE_PYTHON=$(conda info --base)/envs/r-reticulate/bin/python</span>
-<span id="cb329-56"><a href="#cb329-56" aria-hidden="true" tabindex="-1"></a>          quarto render</span>
-<span id="cb329-57"><a href="#cb329-57" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> bash -l {0}</span></span>
-<span id="cb329-58"><a href="#cb329-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-59"><a href="#cb329-59" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Deploy to GitHub Pages</span></span>
-<span id="cb329-60"><a href="#cb329-60" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> peaceiris/actions-gh-pages@v3</span></span>
-<span id="cb329-61"><a href="#cb329-61" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-62"><a href="#cb329-62" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">github_token</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
-<span id="cb329-63"><a href="#cb329-63" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">publish_dir</span><span class="kw">:</span><span class="at"> ./_site</span></span>
-<span id="cb329-64"><a href="#cb329-64" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">publish_branch</span><span class="kw">:</span><span class="at"> gh-pages</span></span>
-<span id="cb329-65"><a href="#cb329-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-66"><a href="#cb329-66" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Log in to GitHub Container Registry</span></span>
-<span id="cb329-67"><a href="#cb329-67" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> docker/login-action@v3</span></span>
-<span id="cb329-68"><a href="#cb329-68" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-69"><a href="#cb329-69" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">registry</span><span class="kw">:</span><span class="at"> ghcr.io</span></span>
-<span id="cb329-70"><a href="#cb329-70" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">username</span><span class="kw">:</span><span class="at"> ${{ github.actor }}</span></span>
-<span id="cb329-71"><a href="#cb329-71" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">password</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
-<span id="cb329-72"><a href="#cb329-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb329-73"><a href="#cb329-73" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Build and push Docker image</span></span>
-<span id="cb329-74"><a href="#cb329-74" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> docker/build-push-action@v5</span></span>
-<span id="cb329-75"><a href="#cb329-75" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb329-76"><a href="#cb329-76" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">context</span><span class="kw">:</span><span class="at"> .</span></span>
-<span id="cb329-77"><a href="#cb329-77" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">push</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
-<span id="cb329-78"><a href="#cb329-78" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">tags</span><span class="kw">:</span><span class="at"> ghcr.io/${{ github.repository_owner }}/my-r-env:latest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb329-28"><a href="#cb329-28" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">channels</span><span class="kw">:</span><span class="at"> conda-forge</span></span>
+<span id="cb329-29"><a href="#cb329-29" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">channel-priority</span><span class="kw">:</span><span class="at"> strict</span></span>
+<span id="cb329-30"><a href="#cb329-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-31"><a href="#cb329-31" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install Python dependencies via Conda</span></span>
+<span id="cb329-32"><a href="#cb329-32" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb329-33"><a href="#cb329-33" aria-hidden="true" tabindex="-1"></a>          conda install -n r-reticulate --override-channels -c conda-forge numpy pandas matplotlib scipy statsmodels scikit-learn -y</span>
+<span id="cb329-34"><a href="#cb329-34" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> bash -l {0}</span></span>
+<span id="cb329-35"><a href="#cb329-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-36"><a href="#cb329-36" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up R</span></span>
+<span id="cb329-37"><a href="#cb329-37" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> r-lib/actions/setup-r@v2</span></span>
+<span id="cb329-38"><a href="#cb329-38" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-39"><a href="#cb329-39" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">use-public-rspm</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb329-40"><a href="#cb329-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-41"><a href="#cb329-41" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Set up Quarto</span></span>
+<span id="cb329-42"><a href="#cb329-42" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> quarto-dev/quarto-actions/setup@v2</span></span>
+<span id="cb329-43"><a href="#cb329-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-44"><a href="#cb329-44" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install R Packages</span></span>
+<span id="cb329-45"><a href="#cb329-45" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb329-46"><a href="#cb329-46" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">GITHUB_PAT</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
+<span id="cb329-47"><a href="#cb329-47" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb329-48"><a href="#cb329-48" aria-hidden="true" tabindex="-1"></a>          install.packages(c(&quot;reticulate&quot;, &quot;knitr&quot;, &quot;rmarkdown&quot;, &quot;dplyr&quot;, &quot;ggplot2&quot;, &quot;broom&quot;, &quot;MASS&quot;))</span>
+<span id="cb329-49"><a href="#cb329-49" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> Rscript {0}</span></span>
+<span id="cb329-50"><a href="#cb329-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-51"><a href="#cb329-51" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Prepare README as Index</span></span>
+<span id="cb329-52"><a href="#cb329-52" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run</span><span class="kw">:</span><span class="at"> cp README.md index.md</span></span>
+<span id="cb329-53"><a href="#cb329-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-54"><a href="#cb329-54" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Render Quarto</span></span>
+<span id="cb329-55"><a href="#cb329-55" aria-hidden="true" tabindex="-1"></a><span class="fu">        run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb329-56"><a href="#cb329-56" aria-hidden="true" tabindex="-1"></a>          export RETICULATE_PYTHON=$(conda info --base)/envs/r-reticulate/bin/python</span>
+<span id="cb329-57"><a href="#cb329-57" aria-hidden="true" tabindex="-1"></a>          quarto render</span>
+<span id="cb329-58"><a href="#cb329-58" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">shell</span><span class="kw">:</span><span class="at"> bash -l {0}</span></span>
+<span id="cb329-59"><a href="#cb329-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-60"><a href="#cb329-60" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Deploy to GitHub Pages</span></span>
+<span id="cb329-61"><a href="#cb329-61" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> peaceiris/actions-gh-pages@v3</span></span>
+<span id="cb329-62"><a href="#cb329-62" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-63"><a href="#cb329-63" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">github_token</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
+<span id="cb329-64"><a href="#cb329-64" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">publish_dir</span><span class="kw">:</span><span class="at"> ./_site</span></span>
+<span id="cb329-65"><a href="#cb329-65" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">publish_branch</span><span class="kw">:</span><span class="at"> gh-pages</span></span>
+<span id="cb329-66"><a href="#cb329-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-67"><a href="#cb329-67" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Log in to GitHub Container Registry</span></span>
+<span id="cb329-68"><a href="#cb329-68" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> docker/login-action@v3</span></span>
+<span id="cb329-69"><a href="#cb329-69" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-70"><a href="#cb329-70" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">registry</span><span class="kw">:</span><span class="at"> ghcr.io</span></span>
+<span id="cb329-71"><a href="#cb329-71" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">username</span><span class="kw">:</span><span class="at"> ${{ github.actor }}</span></span>
+<span id="cb329-72"><a href="#cb329-72" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">password</span><span class="kw">:</span><span class="at"> ${{ secrets.GITHUB_TOKEN }}</span></span>
+<span id="cb329-73"><a href="#cb329-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb329-74"><a href="#cb329-74" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Build and push Docker image</span></span>
+<span id="cb329-75"><a href="#cb329-75" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> docker/build-push-action@v5</span></span>
+<span id="cb329-76"><a href="#cb329-76" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb329-77"><a href="#cb329-77" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">context</span><span class="kw">:</span><span class="at"> .</span></span>
+<span id="cb329-78"><a href="#cb329-78" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">push</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb329-79"><a href="#cb329-79" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">tags</span><span class="kw">:</span><span class="at"> ghcr.io/${{ github.repository_owner }}/my-r-env:latest</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>GHCR 푸시를 위해 <code>permissions</code>에 <code>packages: write</code>를 추가하였다. <code>Dockerfile</code>에서 <code>_site/hw03.ipynb</code>를 복사하므로 Docker 빌드는 반드시 Quarto 렌더링 뒤에 실행되어야 한다.</p>
 </section>
 </section>
